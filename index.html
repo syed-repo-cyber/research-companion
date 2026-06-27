@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Reading Companion</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1d;
+    --surface2: #222226;
+    --surface3: #2a2a2f;
+    --border: #2e2e35;
+    --border2: #3d3d47;
+    --text: #e8e8ea;
+    --text2: #9999a8;
+    --text3: #5a5a6a;
+    --accent: #7c6ff7;
+    --accent-bg: #1e1b40;
+    --accent-text: #a89ff9;
+    --green: #3ec97a;
+    --green-bg: #0f2a1e;
+    --amber: #f0a429;
+    --amber-bg: #2a1f0a;
+    --red: #e85d5d;
+    --red-bg: #2a1010;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── top bar ── */
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    height: 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  #topbar .logo {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  #topbar .logo svg { color: var(--accent); }
+  .tab-group { display: flex; gap: 2px; margin-left: 10px; }
+  .tab {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text2);
+    border: none;
+    background: none;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .tab:hover { background: var(--surface2); color: var(--text); }
+  .tab.active { background: var(--surface3); color: var(--text); font-weight: 500; }
+  .tab .badge {
+    background: var(--accent-bg);
+    color: var(--accent-text);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 99px;
+    font-weight: 600;
+  }
+  .spacer { flex: 1; }
+  .top-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all .15s;
+  }
+  .top-btn:hover { background: var(--surface3); border-color: var(--border2); }
+  .top-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .top-btn.primary:hover { opacity: .88; }
+
+  /* ── layout ── */
+  #layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── sidebar ── */
+  #sidebar {
+    width: 230px;
+    min-width: 230px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  #sidebar-top { padding: 12px; border-bottom: 1px solid var(--border); }
+  .upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px;
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    transition: all .15s;
+  }
+  .upload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+  #paper-list { flex: 1; overflow-y: auto; padding: 8px; }
+  .paper-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 9px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+  .paper-item:hover { background: var(--surface2); }
+  .paper-item.active { background: var(--accent-bg); border-color: rgba(124,111,247,.3); }
+  .paper-thumb {
+    width: 30px;
+    height: 38px;
+    border-radius: 4px;
+    background: var(--red-bg);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+  }
+  .paper-info { flex: 1; min-width: 0; }
+  .paper-name {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .paper-meta { font-size: 10px; color: var(--text3); margin-top: 3px; }
+  .ptag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .ptag-ml { background: var(--accent-bg); color: var(--accent-text); }
+  .ptag-nlp { background: var(--green-bg); color: var(--green); }
+  .ptag-cv { background: var(--amber-bg); color: var(--amber); }
+  #no-papers {
+    display: none;
+    text-align: center;
+    padding: 40px 16px;
+    color: var(--text3);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  #sidebar-bottom { padding: 10px 12px; border-top: 1px solid var(--border); }
+  .coll-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .coll-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .ctag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .ctag:hover, .ctag.active { background: var(--accent-bg); color: var(--accent-text); border-color: rgba(124,111,247,.4); }
+
+  /* ── main content ── */
+  #main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* ── READER ── */
+  #view-reader { display: flex; flex: 1; overflow: hidden; }
+
+  /* pdf pane */
+  #pdf-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #pdf-topbar {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #pdf-topbar-info { flex: 1; min-width: 0; }
+  #pdf-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #pdf-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  #pdf-scroll { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg); }
+  .page-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  .page-label { font-size: 10px; color: var(--text3); text-align: center; margin-bottom: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .page-block h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .page-block p { color: var(--text2); margin-bottom: 10px; }
+  .page-block p:last-child { margin-bottom: 0; }
+  .hl {
+    background: rgba(240,164,41,.18);
+    border-radius: 2px;
+    padding: 0 2px;
+    cursor: pointer;
+    border-bottom: 1.5px solid var(--amber);
+    transition: background .12s;
+  }
+  .hl:hover { background: rgba(240,164,41,.3); }
+
+  /* ai pane */
+  #ai-pane {
+    width: 310px;
+    min-width: 310px;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  #ai-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .ai-tab {
+    flex: 1;
+    padding: 10px 6px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text3);
+    border-bottom: 2px solid transparent;
+    transition: all .12s;
+    border: none;
+    background: none;
+  }
+  .ai-tab:hover { color: var(--text2); }
+  .ai-tab.active { color: var(--accent-text); border-bottom: 2px solid var(--accent); font-weight: 500; }
+
+  #ai-panel { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* summary panel */
+  #panel-summary { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .sum-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+  }
+  .sum-card-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .sum-card-body { font-size: 12px; line-height: 1.65; color: var(--text2); }
+  .sum-card-body ul { padding-left: 14px; }
+  .sum-card-body li { margin-bottom: 3px; }
+  #summary-regen {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #summary-regen:hover { background: var(--surface3); color: var(--text); }
+  #summary-regen:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* chat panel */
+  #panel-chat { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  #chat-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { display: flex; flex-direction: column; max-width: 88%; }
+  .msg.user { align-self: flex-end; }
+  .msg.bot { align-self: flex-start; }
+  .msg-bubble { padding: 9px 12px; border-radius: 10px; font-size: 12.5px; line-height: 1.6; }
+  .msg.user .msg-bubble { background: var(--accent); color: #fff; border-radius: 10px 10px 3px 10px; }
+  .msg.bot .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px 10px 10px 3px; color: var(--text); }
+  .msg-time { font-size: 10px; color: var(--text3); margin-top: 3px; padding: 0 2px; }
+  .msg.user .msg-time { text-align: right; }
+
+  #chat-quick { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px 0; flex-shrink: 0; }
+  .qbtn {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 99px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .qbtn:hover { background: var(--accent-bg); color: var(--accent-text); border-color: rgba(124,111,247,.4); }
+
+  #chat-input-wrap { padding: 10px 12px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; gap: 6px; align-items: flex-end; }
+  #chat-input {
+    flex: 1;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 11px;
+    font-size: 12.5px;
+    font-family: inherit;
+    background: var(--surface2);
+    color: var(--text);
+    resize: none;
+    min-height: 38px;
+    max-height: 90px;
+    line-height: 1.5;
+    transition: border-color .15s;
+  }
+  #chat-input:focus { outline: none; border-color: var(--accent); }
+  #chat-input::placeholder { color: var(--text3); }
+  #send-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  #send-btn:hover { opacity: .85; }
+  #send-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* evidence panel */
+  #panel-evidence { flex: 1; display: none; overflow-y: auto; padding: 12px; flex-direction: column; gap: 8px; }
+  .snippet-card {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 8px 11px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text2);
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+  .snippet-ref { font-size: 10px; color: var(--accent-text); margin-top: 4px; font-style: normal; font-weight: 500; }
+  #evidence-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 4px;
+  }
+  #evidence-more:hover { color: var(--text); background: var(--surface3); }
+  #evidence-more:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── COMPARE ── */
+  #view-compare { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  #compare-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  #compare-bar h3 { font-size: 13px; font-weight: 600; }
+  #compare-bar p { font-size: 11px; color: var(--text3); }
+  #compare-body { flex: 1; display: flex; overflow: hidden; }
+  #compare-papers { display: flex; flex: 1; overflow: auto; padding: 16px; gap: 12px; }
+  .cmp-col { flex: 1; min-width: 200px; }
+  .cmp-col-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+  }
+  .cmp-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .cmp-section-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; }
+  .cmp-section p { font-size: 12px; line-height: 1.65; color: var(--text2); }
+  #compare-ai-panel {
+    width: 260px;
+    min-width: 260px;
+    border-left: 1px solid var(--border);
+    padding: 14px;
+    overflow-y: auto;
+    background: var(--surface);
+  }
+  #compare-ai-panel h4 { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+  .diff-block { margin-bottom: 14px; }
+  .diff-block-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+  .diff-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .tag-same { background: var(--green-bg); color: var(--green); }
+  .tag-diff { background: var(--red-bg); color: var(--red); }
+  .diff-block p { font-size: 12px; line-height: 1.65; color: var(--text2); }
+  #compare-ask-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 7px;
+    margin-top: 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    justify-content: center;
+    transition: all .15s;
+  }
+  #compare-ask-btn:hover { background: var(--surface3); color: var(--text); }
+
+  /* select pills for compare */
+  #compare-selectors { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .compare-sel-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .compare-sel-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: rgba(124,111,247,.4); }
+
+  /* ── NOTES ── */
+  #view-notes { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  #notes-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .note-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 13px;
+    margin-bottom: 10px;
+  }
+  .note-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+  .note-paper { font-size: 10px; font-weight: 600; color: var(--accent-text); }
+  .note-del {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .note-del:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+  .note-hl {
+    font-size: 12px;
+    color: var(--amber);
+    background: var(--amber-bg);
+    border-radius: 4px;
+    padding: 5px 9px;
+    margin-bottom: 5px;
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .note-ann { font-size: 12.5px; color: var(--text2); line-height: 1.65; }
+  #notes-empty { display: none; text-align: center; padding: 50px 20px; color: var(--text3); font-size: 13px; line-height: 1.7; }
+  #notes-footer {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  #notes-footer label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; }
+  #note-paper-sel {
+    width: 100%;
+    margin-bottom: 7px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    font-size: 12px;
+    background: var(--surface2);
+    color: var(--text);
+    font-family: inherit;
+  }
+  #note-textarea {
+    width: 100%;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 11px;
+    font-size: 12.5px;
+    font-family: inherit;
+    background: var(--surface2);
+    color: var(--text);
+    resize: none;
+    height: 60px;
+    line-height: 1.5;
+    transition: border-color .15s;
+  }
+  #note-textarea:focus { outline: none; border-color: var(--accent); }
+  #note-textarea::placeholder { color: var(--text3); }
+  .notes-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .note-action-btn {
+    padding: 6px 13px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .note-action-btn:hover { background: var(--surface3); color: var(--text); }
+  .note-action-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .note-action-btn.primary:hover { opacity: .85; }
+
+  /* ── loading dots ── */
+  .dots { display: inline-flex; gap: 4px; align-items: center; }
+  .dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); animation: blink .8s ease-in-out infinite; }
+  .dots span:nth-child(2) { animation-delay: .2s; }
+  .dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+
+  /* ── scrollbars ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── API key banner ── */
+  #api-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: var(--amber-bg);
+    border-bottom: 1px solid var(--amber);
+    font-size: 12px;
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+  #api-key-input {
+    border: 1px solid var(--amber);
+    border-radius: 5px;
+    padding: 4px 9px;
+    font-size: 12px;
+    background: rgba(0,0,0,.3);
+    color: var(--text);
+    font-family: monospace;
+    width: 280px;
+  }
+  #api-key-input:focus { outline: none; }
+  #api-key-save {
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--amber);
+    background: var(--amber-bg);
+    color: var(--amber);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .12s;
+  }
+  #api-key-save:hover { background: var(--amber); color: #000; }
+  #api-banner.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <div class="logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Research Companion
+  </div>
+  <div class="tab-group">
+    <button class="tab active" onclick="switchView('reader')" id="tab-reader">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Reader
+    </button>
+    <button class="tab" onclick="switchView('compare')" id="tab-compare">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg>
+      Compare
+    </button>
+    <button class="tab" onclick="switchView('notes')" id="tab-notes">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Notes
+      <span class="badge" id="notes-badge">0</span>
+    </button>
+  </div>
+  <div class="spacer"></div>
+  <button class="top-btn" onclick="exportNotes()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Export notes
+  </button>
+</div>
+
+<!-- API key banner -->
+<div id="api-banner">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  Enter your Anthropic API key to enable AI features:
+  <input id="api-key-input" type="password" placeholder="sk-ant-..." spellcheck="false">
+  <button id="api-key-save" onclick="saveApiKey()">Save</button>
+  <span style="margin-left:4px;font-size:11px;opacity:.7">Key stays local in your browser only</span>
+</div>
+
+<div id="layout">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sidebar-top">
+      <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Upload PDFs
+      </button>
+      <input type="file" id="file-input" accept=".pdf" multiple style="display:none" onchange="handleUpload(event)">
+    </div>
+
+    <div id="paper-list">
+      <div id="no-papers">Upload a PDF to get started</div>
+    </div>
+
+    <div id="sidebar-bottom">
+      <div class="coll-label">Collections</div>
+      <div class="coll-tags">
+        <span class="ctag active">All</span>
+        <span class="ctag">ML</span>
+        <span class="ctag">NLP</span>
+        <span class="ctag">CV</span>
+        <span class="ctag" onclick="addCollection()">+ New</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- READER VIEW -->
+    <div id="view-reader" style="display:flex;flex:1;overflow:hidden;">
+      <!-- PDF pane -->
+      <div id="pdf-pane">
+        <div id="pdf-topbar">
+          <div id="pdf-topbar-info">
+            <div id="pdf-title" style="color:var(--text3);font-size:12px;font-weight:400;">No paper selected — upload a PDF to begin</div>
+            <div id="pdf-sub"></div>
+          </div>
+        </div>
+        <div id="pdf-scroll">
+          <div id="pdf-content" style="color:var(--text3);text-align:center;padding:60px 20px;font-size:13px;line-height:1.7;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:12px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <br>Upload a PDF to start reading
+          </div>
+        </div>
+      </div>
+
+      <!-- AI pane -->
+      <div id="ai-pane">
+        <div id="ai-tabs">
+          <button class="ai-tab active" onclick="switchAiTab('summary')" id="aitab-summary">Summary</button>
+          <button class="ai-tab" onclick="switchAiTab('chat')" id="aitab-chat">Ask</button>
+          <button class="ai-tab" onclick="switchAiTab('evidence')" id="aitab-evidence">Evidence</button>
+        </div>
+        <div id="ai-panel">
+          <!-- Summary -->
+          <div id="panel-summary" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="color:var(--text3);font-size:12px;text-align:center;padding:30px 16px;line-height:1.7;">Select a paper and click "Generate summary" to get an AI-powered breakdown.</div>
+            <button id="summary-regen" onclick="generateSummary()" disabled>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Generate summary
+            </button>
+          </div>
+
+          <!-- Chat -->
+          <div id="panel-chat" style="display:none;flex-direction:column;overflow:hidden;flex:1;">
+            <div id="chat-msgs"></div>
+            <div id="chat-quick">
+              <button class="qbtn" onclick="quickAsk('What is the core contribution of this paper?')">Core contribution</button>
+              <button class="qbtn" onclick="quickAsk('What are the main limitations?')">Limitations</button>
+              <button class="qbtn" onclick="quickAsk('Explain the method in simple terms')">Explain method</button>
+              <button class="qbtn" onclick="quickAsk('What are the key results?')">Key results</button>
+            </div>
+            <div id="chat-input-wrap">
+              <textarea id="chat-input" placeholder="Ask about this paper..." onkeydown="handleChatKey(event)" rows="1"></textarea>
+              <button id="send-btn" onclick="sendChat()" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Evidence -->
+          <div id="panel-evidence" style="flex:1;overflow-y:auto;padding:12px;">
+            <div id="evidence-list" style="display:flex;flex-direction:column;gap:6px;">
+              <div style="color:var(--text3);font-size:12px;text-align:center;padding:30px 16px;line-height:1.7;">Evidence snippets will appear here after you generate a summary or click below.</div>
+            </div>
+            <button id="evidence-more" onclick="extractEvidence()" disabled>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Extract evidence snippets
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPARE VIEW -->
+    <div id="view-compare" style="display:none;flex-direction:column;overflow:hidden;flex:1;">
+      <div id="compare-bar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg>
+        <div>
+          <h3>Compare papers</h3>
+          <p id="compare-status">Upload at least 2 papers to compare</p>
+        </div>
+        <div id="compare-selectors" style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <button class="top-btn primary" onclick="runCompare()" id="compare-run-btn" disabled>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Compare with AI
+        </button>
+      </div>
+      <div id="compare-body" style="flex:1;display:flex;overflow:hidden;">
+        <div id="compare-papers" style="flex:1;overflow:auto;padding:16px;display:flex;gap:12px;">
+          <div style="color:var(--text3);font-size:13px;padding:40px;text-align:center;align-self:center;width:100%;">Select papers above and click "Compare with AI"</div>
+        </div>
+        <div id="compare-ai-panel">
+          <h4>AI analysis</h4>
+          <div id="compare-ai-content" style="color:var(--text3);font-size:12px;line-height:1.7;">AI analysis will appear here after comparing.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES VIEW -->
+    <div id="view-notes" style="display:none;flex-direction:column;overflow:hidden;flex:1;">
+      <div id="notes-body">
+        <div id="notes-list"></div>
+        <div id="notes-empty">No notes yet.<br>Highlight text in the reader or add a note below.</div>
+      </div>
+      <div id="notes-footer">
+        <label for="note-paper-sel">Paper</label>
+        <select id="note-paper-sel"></select>
+        <label for="note-textarea">Annotation</label>
+        <textarea id="note-textarea" placeholder="Write your observation or annotation..."></textarea>
+        <div class="notes-actions">
+          <button class="note-action-btn primary" onclick="addNote()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Save note
+          </button>
+          <button class="note-action-btn" onclick="exportNotes()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+// ─────────────────────────────────────────────
+//  State
+// ─────────────────────────────────────────────
+let papers = [];          // {id, name, text, pageCount}
+let activePaperId = null;
+let chatHistory = [];     // [{role, content}]
+let notes = [];           // {id, paperId, paperName, highlight, annotation}
+let chatLocked = false;
+let compareSelected = []; // paper ids
+let apiKey = localStorage.getItem('rc_apikey') || '';
+
+const pdfjsLib = window['pdfjs-dist/build/pdf'];
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ─────────────────────────────────────────────
+//  API key
+// ─────────────────────────────────────────────
+function saveApiKey() {
+  apiKey = document.getElementById('api-key-input').value.trim();
+  if (apiKey) {
+    localStorage.setItem('rc_apikey', apiKey);
+    document.getElementById('api-banner').classList.add('hidden');
+  }
+}
+
+// On load: if key exists hide banner
+if (apiKey) {
+  document.getElementById('api-key-input').value = apiKey;
+  document.getElementById('api-banner').classList.add('hidden');
+}
+
+// ─────────────────────────────────────────────
+//  PDF Upload & Text Extraction
+// ─────────────────────────────────────────────
+async function handleUpload(e) {
+  const files = Array.from(e.target.files);
+  for (const file of files) {
+    if (!file.name.endsWith('.pdf')) continue;
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += `\n\n[Page ${i}]\n` + content.items.map(s => s.str).join(' ');
+    }
+    const id = 'p' + Date.now() + Math.random().toString(36).slice(2,6);
+    papers.push({ id, name: file.name.replace('.pdf',''), text, pageCount: pdf.numPages });
+    addPaperToSidebar(papers[papers.length - 1]);
+    selectPaper(id);
+    // also render pdf pages visually
+    await renderPdfPages(pdf);
+    updateNoteSelector();
+    updateCompareSelectors();
+    updateSummaryBtn();
+  }
+  e.target.value = '';
+}
+
+async function renderPdfPages(pdf) {
+  const container = document.getElementById('pdf-content');
+  container.innerHTML = '';
+  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 1.3 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.cssText = 'width:100%;border-radius:6px;border:1px solid var(--border);margin-bottom:16px;display:block;background:#fff;';
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+  }
+}
+
+function addPaperToSidebar(p) {
+  document.getElementById('no-papers').style.display = 'none';
+  const tags = ['ptag-ml','ptag-nlp','ptag-cv'];
+  const tagLabels = ['ML','NLP','CV'];
+  const tagIdx = papers.length % 3;
+  const el = document.createElement('div');
+  el.className = 'paper-item';
+  el.id = 'pitem-' + p.id;
+  el.onclick = () => selectPaper(p.id);
+  el.innerHTML = `
+    <div class="paper-thumb">PDF</div>
+    <div class="paper-info">
+      <div class="paper-name">${escHtml(p.name)}</div>
+      <div class="paper-meta">${p.pageCount} pages</div>
+      <span class="ptag ${tags[tagIdx]}">${tagLabels[tagIdx]}</span>
+    </div>`;
+  document.getElementById('paper-list').appendChild(el);
+}
+
+function selectPaper(id) {
+  activePaperId = id;
+  chatHistory = [];
+  document.querySelectorAll('.paper-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('pitem-' + id);
+  if (el) el.classList.add('active');
+  const p = papers.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('pdf-title').textContent = p.name;
+  document.getElementById('pdf-sub').textContent = p.pageCount + ' pages';
+  document.getElementById('pdf-title').style.color = '';
+  document.getElementById('pdf-title').style.fontWeight = '600';
+  document.getElementById('pdf-title').style.fontSize = '13px';
+
+  // Reset panels
+  resetSummaryPanel();
+  document.getElementById('chat-msgs').innerHTML = '';
+  appendBotMsg('I\'m ready to answer questions about <strong>' + escHtml(p.name) + '</strong>. What would you like to know?');
+  document.getElementById('evidence-list').innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:30px 16px;line-height:1.7;">Click "Extract evidence snippets" to pull key passages.</div>';
+  updateSummaryBtn();
+}
+
+function updateSummaryBtn() {
+  const btn = document.getElementById('summary-regen');
+  const hasKey = !!apiKey;
+  const hasPaper = !!activePaperId;
+  btn.disabled = !(hasKey && hasPaper);
+  document.getElementById('send-btn').disabled = !(hasKey && hasPaper);
+  document.getElementById('evidence-more').disabled = !(hasKey && hasPaper);
+}
+
+function resetSummaryPanel() {
+  document.getElementById('panel-summary').innerHTML = `
+    <div style="color:var(--text3);font-size:12px;text-align:center;padding:30px 16px;line-height:1.7;">Click "Generate summary" to get an AI-powered breakdown of this paper.</div>
+    <button id="summary-regen" onclick="generateSummary()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate summary
+    </button>`;
+  updateSummaryBtn();
+}
+
+// ─────────────────────────────────────────────
+//  Claude API call
+// ─────────────────────────────────────────────
+async function callClaude(systemPrompt, messages) {
+  if (!apiKey) { alert('Please enter your Anthropic API key first.'); return null; }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'API error ' + res.status);
+  }
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
+function getPaperContext() {
+  const p = papers.find(x => x.id === activePaperId);
+  if (!p) return '';
+  return p.text.slice(0, 12000);
+}
+
+// ─────────────────────────────────────────────
+//  Summary
+// ─────────────────────────────────────────────
+async function generateSummary() {
+  const btn = document.getElementById('summary-regen');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Generating...';
+
+  const p = papers.find(x => x.id === activePaperId);
+  try {
+    const raw = await callClaude(
+      'You are a research assistant. Given extracted PDF text, return a JSON object with keys: abstract (2 sentences), method (2 sentences), results (2 sentences), limitations (array of 3 strings). Respond with ONLY valid JSON.',
+      [{ role: 'user', content: 'Paper text:\n' + getPaperContext() + '\n\nGenerate structured summary JSON.' }]
+    );
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch { parsed = { abstract: raw, method: '', results: '', limitations: [] }; }
+
+    const panel = document.getElementById('panel-summary');
+    panel.innerHTML = `
+      <div class="sum-card"><div class="sum-card-label">Abstract</div><div class="sum-card-body">${escHtml(parsed.abstract || '')}</div></div>
+      <div class="sum-card"><div class="sum-card-label">Method</div><div class="sum-card-body">${escHtml(parsed.method || '')}</div></div>
+      <div class="sum-card"><div class="sum-card-label">Results</div><div class="sum-card-body">${escHtml(parsed.results || '')}</div></div>
+      <div class="sum-card"><div class="sum-card-label">Limitations</div><div class="sum-card-body"><ul>${(parsed.limitations||[]).map(l=>`<li>${escHtml(l)}</li>`).join('')}</ul></div></div>
+      <button id="summary-regen" onclick="generateSummary()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Regenerate
+      </button>`;
+  } catch(e) {
+    alert('Error: ' + e.message);
+    resetSummaryPanel();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Chat
+// ─────────────────────────────────────────────
+function appendBotMsg(html) {
+  const msgs = document.getElementById('chat-msgs');
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = `<div class="msg-bubble">${html}</div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+function appendUserMsg(text) {
+  const msgs = document.getElementById('chat-msgs');
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function appendLoadingMsg() {
+  const msgs = document.getElementById('chat-msgs');
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.id = 'loading-msg';
+  el.innerHTML = `<div class="msg-bubble"><span class="dots"><span></span><span></span><span></span></span></div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || chatLocked) return;
+  if (!activePaperId) { alert('Select a paper first.'); return; }
+  input.value = '';
+  chatLocked = true;
+  document.getElementById('send-btn').disabled = true;
+  appendUserMsg(text);
+  chatHistory.push({ role: 'user', content: text });
+  appendLoadingMsg();
+  try {
+    const reply = await callClaude(
+      'You are a research reading assistant. Answer questions about the paper concisely (under 100 words). Use the paper text as your source. Be specific. The paper text follows:\n\n' + getPaperContext(),
+      chatHistory
+    );
+    document.getElementById('loading-msg')?.remove();
+    appendBotMsg(escHtml(reply).replace(/\n/g,'<br>'));
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('loading-msg')?.remove();
+    appendBotMsg('<span style="color:var(--red)">Error: ' + escHtml(e.message) + '</span>');
+    chatHistory.pop();
+  }
+  chatLocked = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+function quickAsk(q) {
+  document.getElementById('chat-input').value = q;
+  switchAiTab('chat');
+  sendChat();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+// ─────────────────────────────────────────────
+//  Evidence
+// ─────────────────────────────────────────────
+async function extractEvidence() {
+  if (!activePaperId) { alert('Select a paper first.'); return; }
+  const btn = document.getElementById('evidence-more');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Extracting...';
+  try {
+    const raw = await callClaude(
+      'You are a research assistant. Extract 4 key evidence snippets from the paper — important quotes or key claims. Return a JSON array: [{text, page, section}]. Each text max 40 words. Respond ONLY with valid JSON.',
+      [{ role: 'user', content: getPaperContext() }]
+    );
+    let snippets;
+    try { snippets = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { snippets = []; }
+    const list = document.getElementById('evidence-list');
+    list.innerHTML = '';
+    snippets.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'snippet-card';
+      el.innerHTML = `"${escHtml(s.text)}"<div class="snippet-ref">Page ${s.page} · ${escHtml(s.section)}</div>`;
+      list.appendChild(el);
+    });
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Extract more`;
+}
+
+// ─────────────────────────────────────────────
+//  Compare
+// ─────────────────────────────────────────────
+function updateCompareSelectors() {
+  const container = document.getElementById('compare-selectors');
+  container.innerHTML = '';
+  papers.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'compare-sel-btn' + (compareSelected.includes(p.id) ? ' active' : '');
+    btn.textContent = p.name.length > 22 ? p.name.slice(0,22)+'…' : p.name;
+    btn.onclick = () => toggleCompareSelect(p.id, btn);
+    container.appendChild(btn);
+  });
+  document.getElementById('compare-status').textContent =
+    papers.length < 2 ? 'Upload at least 2 papers to compare' :
+    compareSelected.length < 2 ? `Select ${2 - compareSelected.length} more paper(s) to compare` :
+    `Comparing ${compareSelected.length} papers`;
+  document.getElementById('compare-run-btn').disabled = compareSelected.length < 2 || !apiKey;
+}
+
+function toggleCompareSelect(id, btn) {
+  if (compareSelected.includes(id)) {
+    compareSelected = compareSelected.filter(x => x !== id);
+    btn.classList.remove('active');
+  } else if (compareSelected.length < 3) {
+    compareSelected.push(id);
+    btn.classList.add('active');
+  }
+  document.getElementById('compare-status').textContent =
+    compareSelected.length < 2 ? `Select ${2 - compareSelected.length} more paper(s)` :
+    `Comparing ${compareSelected.length} papers`;
+  document.getElementById('compare-run-btn').disabled = compareSelected.length < 2 || !apiKey;
+}
+
+async function runCompare() {
+  if (compareSelected.length < 2) return;
+  const btn = document.getElementById('compare-run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Comparing...';
+
+  const selected = compareSelected.map(id => papers.find(p => p.id === id)).filter(Boolean);
+
+  // Render columns
+  const papersDiv = document.getElementById('compare-papers');
+  papersDiv.innerHTML = '';
+  selected.forEach(p => {
+    const col = document.createElement('div');
+    col.className = 'cmp-col';
+    col.innerHTML = `
+      <div class="cmp-col-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        ${escHtml(p.name)}
+      </div>
+      <div class="cmp-section" id="cmp-${p.id}-core"><div class="cmp-section-label">Core idea</div><div class="cmp-section p"><span class="dots"><span></span><span></span><span></span></span></div></div>
+      <div class="cmp-section" id="cmp-${p.id}-method"><div class="cmp-section-label">Method</div><div class="cmp-section p"><span class="dots"><span></span><span></span><span></span></span></div></div>
+      <div class="cmp-section" id="cmp-${p.id}-results"><div class="cmp-section-label">Results</div><div class="cmp-section p"><span class="dots"><span></span><span></span><span></span></span></div></div>`;
+    papersDiv.appendChild(col);
+  });
+
+  // AI analysis
+  document.getElementById('compare-ai-content').innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+
+  try {
+    const contexts = selected.map(p => `Paper: "${p.name}"\n${p.text.slice(0,4000)}`).join('\n\n---\n\n');
+    const raw = await callClaude(
+      'You are a research assistant comparing academic papers. Return a JSON object with: papers (array, each: {id (paper title), core, method, results}), analysis: {shared_themes, key_differences, methods_comparison, combined_impact}. Be concise. ONLY JSON.',
+      [{ role: 'user', content: contexts }]
+    );
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch { parsed = null; }
+
+    if (parsed?.papers) {
+      parsed.papers.forEach((pp, i) => {
+        const p = selected[i];
+        if (!p) return;
+        const fillSection = (suffix, val) => {
+          const el = document.getElementById(`cmp-${p.id}-${suffix}`);
+          if (el) el.querySelector('.cmp-section p, p') && (el.querySelector('div:last-child').textContent = val || '');
+        };
+        const core = document.getElementById(`cmp-${p.id}-core`);
+        const method = document.getElementById(`cmp-${p.id}-method`);
+        const results = document.getElementById(`cmp-${p.id}-results`);
+        if (core) core.querySelector('div:last-child').innerHTML = `<p>${escHtml(pp.core||'')}</p>`;
+        if (method) method.querySelector('div:last-child').innerHTML = `<p>${escHtml(pp.method||'')}</p>`;
+        if (results) results.querySelector('div:last-child').innerHTML = `<p>${escHtml(pp.results||'')}</p>`;
+      });
+    }
+    if (parsed?.analysis) {
+      const a = parsed.analysis;
+      document.getElementById('compare-ai-content').innerHTML = `
+        <div class="diff-block"><div class="diff-block-label"><span class="diff-tag tag-same">SHARED</span> Themes</div><p>${escHtml(a.shared_themes||'')}</p></div>
+        <div class="diff-block"><div class="diff-block-label"><span class="diff-tag tag-diff">DIFFERS</span> Key differences</div><p>${escHtml(a.key_differences||'')}</p></div>
+        <div class="diff-block"><div class="diff-block-label"><span class="diff-tag tag-diff">DIFFERS</span> Methods</div><p>${escHtml(a.methods_comparison||'')}</p></div>
+        <div class="diff-block"><div class="diff-block-label">Impact</div><p>${escHtml(a.combined_impact||'')}</p></div>
+        <button id="compare-ask-btn" onclick="switchViewAndAsk()">Ask across these papers ↗</button>`;
+    }
+  } catch(e) {
+    document.getElementById('compare-ai-content').innerHTML = '<span style="color:var(--red);font-size:12px">Error: ' + escHtml(e.message) + '</span>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Compare with AI`;
+}
+
+function switchViewAndAsk() {
+  switchView('reader');
+  switchAiTab('chat');
+  const names = compareSelected.map(id => papers.find(p=>p.id===id)?.name).filter(Boolean);
+  document.getElementById('chat-input').value = `How do ${names.join(' and ')} differ in their approach?`;
+}
+
+// ─────────────────────────────────────────────
+//  Notes
+// ─────────────────────────────────────────────
+function updateNoteSelector() {
+  const sel = document.getElementById('note-paper-sel');
+  sel.innerHTML = papers.map(p => `<option value="${p.id}">${escHtml(p.name)}</option>`).join('');
+}
+
+function addNote() {
+  const sel = document.getElementById('note-paper-sel');
+  const text = document.getElementById('note-textarea').value.trim();
+  if (!text) return;
+  const paperId = sel.value;
+  const paper = papers.find(p => p.id === paperId);
+  const id = 'n' + Date.now();
+  notes.push({ id, paperId, paperName: paper?.name || '', highlight: '', annotation: text });
+  document.getElementById('note-textarea').value = '';
+  renderNotes();
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  renderNotes();
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  list.innerHTML = '';
+  notes.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'note-card';
+    el.innerHTML = `
+      <div class="note-header">
+        <span class="note-paper">${escHtml(n.paperName)}</span>
+        <button class="note-del" onclick="deleteNote('${n.id}')">Delete</button>
+      </div>
+      ${n.highlight ? `<div class="note-hl">"${escHtml(n.highlight)}"</div>` : ''}
+      <div class="note-ann">${escHtml(n.annotation)}</div>`;
+    list.appendChild(el);
+  });
+  document.getElementById('notes-empty').style.display = notes.length ? 'none' : 'block';
+  document.getElementById('notes-badge').textContent = notes.length;
+}
+
+function exportNotes() {
+  if (!notes.length) { alert('No notes to export yet.'); return; }
+  let txt = 'Research Notes\n' + '═'.repeat(40) + '\n\n';
+  notes.forEach((n, i) => {
+    txt += `[${i+1}] ${n.paperName}\n`;
+    if (n.highlight) txt += `  Highlight: "${n.highlight}"\n`;
+    txt += `  Note: ${n.annotation}\n\n`;
+  });
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt);
+  a.download = 'research-notes.txt';
+  a.click();
+}
+
+// ─────────────────────────────────────────────
+//  View / tab switching
+// ─────────────────────────────────────────────
+function switchView(view) {
+  ['reader','compare','notes'].forEach(v => {
+    const el = document.getElementById('view-' + v);
+    el.style.display = 'none';
+    document.getElementById('tab-' + v).classList.remove('active');
+  });
+  const el = document.getElementById('view-' + view);
+  el.style.display = 'flex';
+  document.getElementById('tab-' + view).classList.add('active');
+}
+
+function switchAiTab(tab) {
+  ['summary','chat','evidence'].forEach(t => {
+    const panel = document.getElementById('panel-' + t);
+    panel.style.display = 'none';
+    document.getElementById('aitab-' + t).classList.remove('active');
+  });
+  const panel = document.getElementById('panel-' + tab);
+  panel.style.display = tab === 'chat' ? 'flex' : 'flex';
+  panel.style.flexDirection = tab === 'chat' ? 'column' : 'column';
+  if (tab !== 'chat') panel.style.overflowY = 'auto';
+  document.getElementById('aitab-' + tab).classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+//  Utils
+// ─────────────────────────────────────────────
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function addCollection() {
+  const name = prompt('Collection name:');
+  if (!name) return;
+  const tag = document.createElement('span');
+  tag.className = 'ctag';
+  tag.textContent = name;
+  tag.onclick = function() { this.classList.toggle('active'); };
+  document.querySelector('.coll-tags').insertBefore(tag, document.querySelector('.coll-tags span:last-child'));
+}
+
+// Init
+renderNotes();
+</script>
+</body>
+</html>
